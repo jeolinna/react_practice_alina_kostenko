@@ -9,7 +9,7 @@ import productsFromServer from './api/products';
 
 const products = productsFromServer.map(product => {
   const category =
-    categoriesFromServer.find(cat => cat.id === product.catId) || null;
+    categoriesFromServer.find(cat => cat.id === product.categoryId) || null;
   const user =
     usersFromServer.find(person => person.id === category.ownerId) || null;
 
@@ -22,12 +22,12 @@ const products = productsFromServer.map(product => {
 
 export const App = () => {
   const [filteredByUser, setFilteredByUser] = useState('All');
-  // const [filteredByCategory, setFilteredByCategory] = useState([]);
+  const [filteredByCategory, setFilteredByCategory] = useState([]);
   // const [searchQuery, setSearchQuery] = useState('');
 
   const handleResetFilters = () => {
     setFilteredByUser('All');
-    // setFilteredByCategory([]);
+    setFilteredByCategory([]);
     // setSearchQuery('');
   };
 
@@ -35,7 +35,11 @@ export const App = () => {
     const filterUser =
       filteredByUser === 'All' || product.user.name === filteredByUser;
 
-    return filterUser;
+    const filterCategory =
+      filteredByCategory.length === 0 ||
+      filteredByCategory.includes(product.category.title);
+
+    return filterUser && filterCategory;
   });
 
   return (
@@ -76,7 +80,7 @@ export const App = () => {
               })}
             </p>
 
-            <div className="panel-block">
+            {/* <div className="panel-block">
               <p className="control has-icons-left has-icons-right">
                 <input
                   data-cy="SearchField"
@@ -90,16 +94,16 @@ export const App = () => {
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
 
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
+                <span className="icon is-right"> */}
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            {/* <button
                     data-cy="ClearButton"
                     type="button"
                     className="delete"
                   />
                 </span>
               </p>
-            </div>
+            </div> */}
 
             <div className="panel-block is-flex-wrap-wrap">
               <a
@@ -110,28 +114,20 @@ export const App = () => {
                 All
               </a>
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 4
-              </a>
+              {categoriesFromServer.map(category => {
+                return (
+                  <a
+                    data-cy="Category"
+                    className={cn('button mr-2 my-1', {
+                      'is-info': filteredByCategory.includes(category.title),
+                    })}
+                    href={category.title}
+                    key={category.id}
+                  >
+                    {category.title}
+                  </a>
+                );
+              })}
             </div>
 
             <div className="panel-block">
@@ -139,6 +135,7 @@ export const App = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
+                onClick={handleResetFilters}
               >
                 Reset all filters
               </a>

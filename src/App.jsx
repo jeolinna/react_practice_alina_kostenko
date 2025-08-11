@@ -22,14 +22,21 @@ const products = productsFromServer.map(product => {
 
 export const App = () => {
   const [filteredByUser, setFilteredByUser] = useState('All');
-  const [filteredByCategory, setFilteredByCategory] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [filteredByCategory, setFilteredByCategory] = useState([]);
+  // const [searchQuery, setSearchQuery] = useState('');
 
   const handleResetFilters = () => {
     setFilteredByUser('All');
-    setFilteredByCategory([]);
-    setSearchQuery('');
+    // setFilteredByCategory([]);
+    // setSearchQuery('');
   };
+
+  const filteredProducts = products.filter(product => {
+    const filterUser =
+      filteredByUser === 'All' || product.user.name === filteredByUser;
+
+    return filterUser;
+  });
 
   return (
     <div className="section">
@@ -197,18 +204,21 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => (
+              {filteredProducts.map(product => (
                 <tr key={product.id} data-cy="Product">
                   <td className="has-text-weight-bold" data-cy="ProductId">
                     {product.id}
                   </td>
                   <td data-cy="ProductName">{product.name}</td>
                   <td data-cy="ProductCategory">
-                    {product.category`${product.category.icon} - ${product.category.name}`}
+                    {`${product.category.icon} - ${product.category.title}`}
                   </td>
                   <td
                     data-cy="ProductUser"
-                    className={`${product.user.gender === 'male' ? 'has-text-link' : 'has-text-danger'}`}
+                    className={cn({
+                      'has-text-link': product.user.sex === 'm',
+                      'has-text-danger': product.user.sex === 'f',
+                    })}
                   >
                     {product.user.name}
                   </td>

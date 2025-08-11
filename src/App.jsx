@@ -23,10 +23,12 @@ const products = productsFromServer.map(product => {
 export const App = () => {
   const [filteredByUser, setFilteredByUser] = useState('All');
   const [filteredByCategory, setFilteredByCategory] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleResetFilters = () => {
     setFilteredByUser('All');
     setFilteredByCategory([]);
+    setSearchQuery('');
   };
 
   const filteredProducts = products.filter(product => {
@@ -37,7 +39,11 @@ export const App = () => {
       filteredByCategory.length === 0 ||
       filteredByCategory.includes(product.category.title);
 
-    return filterUser && filterCategory;
+    const search = product.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    return filterUser && filterCategory && search;
   });
 
   return (
@@ -85,6 +91,8 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
+                  value={searchQuery}
+                  onChange={element => setSearchQuery(element.target.value)}
                 />
 
                 <span className="icon is-left">

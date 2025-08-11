@@ -1,16 +1,23 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React from 'react';
 import './App.scss';
+import cn from 'classnames';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 
 const products = productsFromServer.map(product => {
-  const category = null; // find by product.categoryId
-  const user = null; // find by category.ownerId
+  const category =
+    categoriesFromServer.find(cat => cat.id === product.catId) || null;
+  const user =
+    usersFromServer.find(person => person.id === category.ownerId) || null;
 
-  return null;
+  return {
+    ...product,
+    category,
+    user,
+  };
 });
 
 export const App = () => {
@@ -34,15 +41,32 @@ export const App = () => {
             <p className="panel-heading">Filters</p>
 
             <p className="panel-tabs has-text-weight-bold">
-              <a data-cy="FilterAllUsers" href="#/">
+              <a
+                data-cy="FilterAllUsers"
+                href="#/"
+                className={cn({
+                  'is-active': filteredByUser === 'All',
+                })}
+                onClick={() => setFilteredByUser('All')}
+              >
                 All
               </a>
 
-              {usersFromServer.map(user => (
-                <a key={user.id} data-cy="FilterUser" href={user.name}>
-                  {user.name}
-                </a>
-              ))}
+              {usersFromServer.map(user => {
+                return (
+                  <a
+                    key={user.id}
+                    data-cy="FilterUser"
+                    href={`#/${user.name}`}
+                    className={cn({
+                      'is-active': filteredByUser === `${user.name}`,
+                    })}
+                    onClick={() => setFilteredByUser(user.name)}
+                  >
+                    {user.name}
+                  </a>
+                );
+              })}
             </p>
 
             <div className="panel-block">
@@ -173,44 +197,23 @@ export const App = () => {
             </thead>
 
             <tbody>
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  1
-                </td>
-
-                <td data-cy="ProductName">Milk</td>
-                <td data-cy="ProductCategory">🍺 - Drinks</td>
-
-                <td data-cy="ProductUser" className="has-text-link">
-                  Max
-                </td>
-              </tr>
-
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  2
-                </td>
-
-                <td data-cy="ProductName">Bread</td>
-                <td data-cy="ProductCategory">🍞 - Grocery</td>
-
-                <td data-cy="ProductUser" className="has-text-danger">
-                  Anna
-                </td>
-              </tr>
-
-              <tr data-cy="Product">
-                <td className="has-text-weight-bold" data-cy="ProductId">
-                  3
-                </td>
-
-                <td data-cy="ProductName">iPhone</td>
-                <td data-cy="ProductCategory">💻 - Electronics</td>
-
-                <td data-cy="ProductUser" className="has-text-link">
-                  Roma
-                </td>
-              </tr>
+              {products.map(product => (
+                <tr key={product.id} data-cy="Product">
+                  <td className="has-text-weight-bold" data-cy="ProductId">
+                    {product.id}
+                  </td>
+                  <td data-cy="ProductName">{product.name}</td>
+                  <td data-cy="ProductCategory">
+                    {product.category`${product.category.icon} - ${product.category.name}`}
+                  </td>
+                  <td
+                    data-cy="ProductUser"
+                    className={`${product.user.gender === 'male' ? 'has-text-link' : 'has-text-danger'}`}
+                  >
+                    {product.user.name}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

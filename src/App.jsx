@@ -23,12 +23,10 @@ const products = productsFromServer.map(product => {
 export const App = () => {
   const [filteredByUser, setFilteredByUser] = useState('All');
   const [filteredByCategory, setFilteredByCategory] = useState([]);
-  // const [searchQuery, setSearchQuery] = useState('');
 
   const handleResetFilters = () => {
     setFilteredByUser('All');
     setFilteredByCategory([]);
-    // setSearchQuery('');
   };
 
   const filteredProducts = products.filter(product => {
